@@ -11,7 +11,9 @@ import java.lang.*;
 public class Instance {
 
     class TimeInfo {
+        public TimeInfo() {
 
+        }
     }
 
     private String alias;
@@ -27,7 +29,7 @@ public class Instance {
     }
 
     public static Instance create() {
-        
+        return new Instance("", null, 0l, new Input());
     }
 
 }

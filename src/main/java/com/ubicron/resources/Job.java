@@ -28,7 +28,7 @@ public class Job {
     }
 
     public Output execute(Input input) {
-
+        return null;
     }
 
     public static Job create() {

@@ -14,7 +14,7 @@ import org.apache.commons.cli.*;
 public class Main {
 
     private static DaemonConnection accessDaemon() {
-
+        return null;
     }
 
     private static void startDaemon() {
@@ -145,7 +145,7 @@ public class Main {
             if (addParam.equals(JOB_RESOURCE)) {
                 deleteJob(r, delParam);
             } else {
-                addInstance(r, delParam);
+                deleteInstance(r, delParam);
             }
         }
 
