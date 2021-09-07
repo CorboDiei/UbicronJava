@@ -28,8 +28,4 @@ public class Instance {
         this.input = input;
     }
 
-    public static Instance create() {
-        return new Instance("", null, 0l, new Input());
-    }
-
 }

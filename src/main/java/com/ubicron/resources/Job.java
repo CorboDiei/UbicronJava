@@ -31,7 +31,4 @@ public class Job {
         return null;
     }
 
-    public static Job create() {
-        return new Job("", new ArrayList<>(), new ArrayList<>(), new Input(), new Output(), new SubCalls());
-    }
 }

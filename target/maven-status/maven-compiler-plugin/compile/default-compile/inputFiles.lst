@@ -1,0 +1,13 @@
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/formats/json/JSONItem.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/resources/Job.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/daemon/Daemon.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/resources/MakeResource.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/Main.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/formats/Output.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/formats/Input.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/resources/Instance.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/formats/SubCalls.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/exceptions/JSONParseException.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/exceptions/JSONAccessException.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/Log.java
+/home/corbo/projects/ubicronjava/ubicron-local-app/src/main/java/com/ubicron/daemon/Listener.java

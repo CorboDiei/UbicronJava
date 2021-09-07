@@ -7,18 +7,35 @@ package com.ubicron;
 
 import java.util.*;
 import java.lang.*;
+import java.io.*;
 
 import org.apache.commons.cli.*;
 
 
 public class Main {
 
-    private static DaemonConnection accessDaemon() {
-        return null;
-    }
+    // private static DaemonConnection accessDaemon() {
+    //     return null;
+    // }
 
     private static void startDaemon() {
-        System.out.println("Starting daemon");
+        try {
+            ProcessBuilder pb = new ProcessBuilder("java", "-cp", "target/classes", "com.ubicron.Listener", "ye");
+            pb.inheritIO();
+            Process process = pb.start();
+            // System.out.println(process);
+            // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            // StringBuilder builder = new StringBuilder();
+            // String line = null;
+            // while ((line = reader.readLine()) != null) {
+            //     builder.append(line);
+            //     builder.append(System.getProperty("line.separator"));
+            // }
+            // System.out.println(builder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static void listJobs(boolean remote) {
@@ -30,7 +47,7 @@ public class Main {
     }
 
     private static void addJob(boolean remote) {
-        System.out.println(Job.create());
+        System.out.println("ye");
     }
 
     private static void addInstance(boolean remote) {
@@ -102,6 +119,10 @@ public class Main {
             formatter.printHelp("command line parameters", options);
             
             System.exit(0);
+        }
+
+        if (cmd.hasOption("s")) {
+            startDaemon();
         }
 
         if (cmd.hasOption("log")) {
