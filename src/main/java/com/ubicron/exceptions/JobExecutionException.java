@@ -1,21 +1,22 @@
 package com.ubicron;
 
 /** Copyright 2021 David Corbo
- *  Failure accessing JSON
+ *  Failure running job
  *  Last edited: 9/4/21
  */
 
 import java.util.*;
 import java.lang.*;
 
-public class JSONAccessException extends Exception {
+public class JobExecutionException extends Exception {
+
     private String message;
 
-    public JSONAccessException(String message) {
+    public JobExecutionException(String message) {
         this.message = message;
     }
 
     public String toString() {
-        return "JSONAccess exception: " + this.message;
+        return "JobExecutionException: " + this.message;
     }
 }

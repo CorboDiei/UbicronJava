@@ -20,7 +20,7 @@ public class Main {
 
     private static void startDaemon() {
         try {
-            ProcessBuilder pb = new ProcessBuilder("java", "-cp", "target/classes", "com.ubicron.Listener", "ye");
+            ProcessBuilder pb = new ProcessBuilder("sudo", "java", "-cp", "target/classes", "com.ubicron.Listener", "ye");
             pb.inheritIO();
             Process process = pb.start();
             // System.out.println(process);

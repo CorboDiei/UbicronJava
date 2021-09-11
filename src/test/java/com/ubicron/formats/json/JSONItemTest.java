@@ -54,4 +54,14 @@ public class JSONItemTest {
             assertTrue(false);
         }
     }
+
+    // @Test
+    // public void nestedString() {
+    //     try {
+    //         JSONItem item = new JSONItem("commands")
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         assertTrue(false);
+    //     }
+    // }
 }

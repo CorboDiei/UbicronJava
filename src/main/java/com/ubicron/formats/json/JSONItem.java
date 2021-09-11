@@ -1,7 +1,7 @@
 package com.ubicron;
 
 /** Copyright 2021 David Corbo
- *  Job definition
+ *  JSONItem definition
  *  Last edited: 9/4/21
  */
 
@@ -43,8 +43,12 @@ public class JSONItem {
         boolean escaped = false;
 
         int i = start;
+        // System.err.println(i);
 
-        while (i < json.length() && json.charAt(i) == ' ') i++;
+        while (i < json.length() && (' ' == json.charAt(i) || '\r' == json.charAt(i) ||
+            '\n' == json.charAt(i) || '\t' == json.charAt(i))) i++;
+        // System.err.println(i);
+        // System.err.println(json.charAt(i));
         if (i == json.length() || json.charAt(i) != '"') fail(json);
         strStart = i;
         i++;
@@ -68,6 +72,8 @@ public class JSONItem {
         // returns the JSONItem value and the index where the value ends
         boolean inValue = false;
         Stack<Character> stack = new Stack<>();
+
+
 
         // System.err.println(json);
         // System.err.println(start);
@@ -109,6 +115,28 @@ public class JSONItem {
                     i++;
                     break;
                 case ' ':
+                    // System.err.println(i);
+                    if (stack.isEmpty() && inValue) {
+                        return new Object[]{new JSONItem(json.substring(start, i)), i};
+                    }
+                    i++;
+                    break;
+                case '\n':
+                    // System.err.println(i);
+                    if (stack.isEmpty() && inValue) {
+                        return new Object[]{new JSONItem(json.substring(start, i)), i};
+                    }
+                    i++;
+                    break;
+                case '\t':
+                    // System.err.println(i);
+                    if (stack.isEmpty() && inValue) {
+                        return new Object[]{new JSONItem(json.substring(start, i)), i};
+                    }
+                    i++;
+                    break;
+                case '\r':
+                    // System.err.println(i);
                     if (stack.isEmpty() && inValue) {
                         return new Object[]{new JSONItem(json.substring(start, i)), i};
                     }
@@ -129,26 +157,33 @@ public class JSONItem {
     private Object[] parseStruct(String json) throws JSONParseException {
         if (json.charAt(json.length() - 1) != '}') fail(json);
         json = json.substring(1, json.length() - 1).trim();
-        if (json.length() == 0) throw new JSONParseException("empty object");
-        if (json.charAt(json.length() - 1) == ',') fail(json);
         Map<String, JSONItem> struct = new HashMap<>();
         List<String> order = new ArrayList<>();
+        if (json.length() == 0) return new Object[]{struct, order};
+        if (json.charAt(json.length() - 1) == ',') fail(json);
 
         int i = 0;
         while (i < json.length()) {
+            // System.err.println("n");
             Object[] key = getKey(json, i);
             i = ((Integer) key[1]).intValue();
-            while (i < json.length() && ' ' == json.charAt(i)) i++;
+            // System.err.println("1 i at " + i);
+            while (i < json.length() && (' ' == json.charAt(i) || '\r' == json.charAt(i) ||
+                '\n' == json.charAt(i) || '\t' == json.charAt(i))) i++;
             if (json.length() == i || json.charAt(i) != ':') fail(json);
             else i++;
+            // System.err.println("2 i at " + i);
             Object[] value = getValue(json, i);
             struct.put((String) key[0], (JSONItem) value[0]);
             order.add((String) key[0]);
             i = ((Integer) value[1]).intValue();
-            while (i < json.length() && ' ' == json.charAt(i)) i++;
+            // System.err.println("3 i at " + i);
+            while (i < json.length() && (' ' == json.charAt(i) || '\r' == json.charAt(i) ||
+                '\n' == json.charAt(i) || '\t' == json.charAt(i))) i++;
             if (i == json.length()) break;
-            else if (json.charAt(i) != ',') fail(json);
+            if (json.charAt(i) != ',') fail(json);
             else i++;
+            // System.err.println("4 i at " + i);
         }
 
         return new Object[]{struct, order};
@@ -157,9 +192,11 @@ public class JSONItem {
     private List<JSONItem> parseArray(String json) throws JSONParseException {
         if (json.charAt(json.length() - 1) != ']') fail(json);
         json = json.substring(1, json.length() - 1).trim();
-        if (json.length() == 0) throw new JSONParseException("empty array");
-        if (json.charAt(json.length() - 1) == ',') fail(json);
         List<JSONItem> array = new ArrayList<>();
+        if (json.length() == 0) return array;
+        if (json.charAt(json.length() - 1) == ',') fail(json);
+        
+        // System.err.println(json);
 
         int i = 0;
 
@@ -170,7 +207,8 @@ public class JSONItem {
             // System.err.println("IN");
             i = ((Integer) value[1]).intValue();
             array.add((JSONItem) value[0]);
-            while (i < json.length() && ' ' == json.charAt(i)) i++;
+            while (i < json.length() && (' ' == json.charAt(i) || '\r' == json.charAt(i) ||
+                '\n' == json.charAt(i) || '\t' == json.charAt(i))) i++;
             if (i == json.length()) break;
             else if (json.charAt(i) != ',') fail(json);
             else i++;
@@ -333,5 +371,29 @@ public class JSONItem {
                 }
         }
         throw new JSONAccessException("you can only access objects and arrays");
+    }
+
+    public void insert(String path, JSONItem item) throws JSONAccessException {
+        if (this.type != JSONItem.Types.STRUCT)
+            throw new JSONAccessException("you can only insert items into objects");
+        int splitPos = path.indexOf(".");
+        if (splitPos == -1) {
+            if (!this.structValue.containsKey(path)) this.itemOrder.add(path);
+            this.structValue.put(path, item);
+        } else {
+            String key = path.substring(0, splitPos);
+            path = path.substring(splitPos + 1);
+            if (!this.structValue.containsKey(key)) {
+                this.itemOrder.add(key);
+                try {
+                    this.structValue.put(key, new JSONItem("{}"));
+                } catch (JSONParseException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+                
+            }
+            this.structValue.get(key).insert(path, item);
+        }
     }
 }
