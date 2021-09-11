@@ -25,9 +25,10 @@ public class JobExecutor implements Runnable {
 
     public void run() {
         try {
-            Input genInput = job.execute(this.input);
-            System.out.println(genInput);
+            System.out.println("Running " + this.job.getAlias());
+            Input genInput = this.job.execute(this.input);
             if (genInput == null) return;
+            System.out.println("Output: " + genInput);
             Object[] fromCalls = job.getSubCalls().getCalls();
             List<String> jobOrder = (List<String>) fromCalls[0];
             Map<String, Input> jobToInput = (Map<String, Input>) fromCalls[1];

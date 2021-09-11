@@ -12,17 +12,42 @@ import java.util.concurrent.*;
 public class Daemon implements Runnable {
 
     private Map<String, Job> aliasToJob;
-    private List<Instance> timedInst;
+    private Queue<Instance> timedInst;
     private ExecutorService threadPool;
+    private State state;
 
-    public Daemon(Map<String, Job> jobMap, List<Instance> timedInst, ExecutorService tPool) {
+    public Daemon(Map<String, Job> jobMap, Queue<Instance> timedInst,
+        ExecutorService tPool, State state) {
         this.aliasToJob = jobMap;
         this.timedInst = timedInst;
         this.threadPool = tPool;
+        this.state = state;
     }
 
     public void run() {
-        // TODO: 6
         System.out.println("Daemon running");
+        while (state.daemonActive()) {
+            if (!timedInst.isEmpty()) {
+                Instance inst = timedInst.poll();
+                if (inst.getTimeToRun() <= System.currentTimeMillis()) {
+                    // execute job
+                    JobExecutor jobEx = new JobExecutor(this.aliasToJob,
+                        this.aliasToJob.get(inst.getJob()), inst.getInput(), this.threadPool);
+                    threadPool.execute(jobEx);
+                    if (inst.newTimeToRun()) this.timedInst.add(inst);
+                } else {
+                    // go to sleep
+                    this.timedInst.add(inst);
+                    try {
+                        Thread.sleep(inst.getTimeToRun() - System.currentTimeMillis());
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
+                    
+                }
+            }
+            
+        }
+
     }
 }

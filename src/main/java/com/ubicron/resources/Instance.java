@@ -23,20 +23,25 @@ public class Instance {
     private Input input;
     private Types type;
     private TimeInfo timeInfo;
+    private String in;
     private long timeToRun;
-    
 
-    public Instance(String alias, String job, Input input, Types type, TimeInfo info, long ttr) {
+    public Instance(String alias, String job, Input input, Types type, TimeInfo info) {
         this.alias = alias;
         this.job = job; 
         this.input = input;
         this.type = type;
         this.timeInfo = info;
-        this.timeToRun = ttr;
-        if (this.type == Types.RECURRING) {
+        this.in = in;
+        if (this.type == Types.RECURRING || this.type == Types.IN) {
             this.timeToRun = this.timeInfo.timeToRun();
         }
+    }
 
+    public boolean newTimeToRun() {
+        if (this.type != Types.RECURRING) return false;
+        this.timeToRun = this.timeInfo.timeToRun();
+        return true;
     }
 
     public long getTimeToRun() {

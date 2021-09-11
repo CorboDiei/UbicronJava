@@ -79,23 +79,26 @@ public class ParseTable {
                 throw new JSONAccessException("type value is not of type int");
             Instance.Types type = Instance.Types.NULL;
             TimeInfo info = null;
-            long ttr = -1l;
             switch (item.get("type").intValue) {
                 case 0:
                     type = Instance.Types.INSTANT;
                     break;
                 case 1:
                     type = Instance.Types.IN;
-                    if (item.get("in").type != JSONItem.Types.INT)
-                        throw new JSONAccessException("in value is not of type int");
-                    ttr = item.get("in").intValue;
+                    if (item.get("time").type != JSONItem.Types.STRING)
+                        throw new JSONAccessException("time value is not of type string");
+                    try {
+                        info = new TimeInfo(item.get("time").stringValue, Instance.Types.IN);
+                    } catch (JSONParseException e) {
+                        throw new JSONAccessException("couldn't parse time info");
+                    }
                     break;
                 case 2:
                     type = Instance.Types.RECURRING;
                     if (item.get("time").type != JSONItem.Types.STRING)
                         throw new JSONAccessException("time value is not of type string");
                     try {
-                        info = new TimeInfo(item.get("time").stringValue);
+                        info = new TimeInfo(item.get("time").stringValue, Instance.Types.RECURRING);
                     } catch (JSONParseException e) {
                         throw new JSONAccessException("couldn't parse time info");
                     }
@@ -106,7 +109,7 @@ public class ParseTable {
                 default:
                     throw new JSONAccessException("invalid type value");
             }
-            instanceList.add(new Instance(alias, job, input, type, info, ttr));
+            instanceList.add(new Instance(alias, job, input, type, info));
         }
         return instanceList;
     }

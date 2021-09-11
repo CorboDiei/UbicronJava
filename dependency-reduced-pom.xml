@@ -20,7 +20,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.ubicron.Listener</mainClass>
+                  <mainClass>com.ubicron.Start</mainClass>
                 </transformer>
               </transformers>
             </configuration>
