@@ -174,10 +174,12 @@ public class ParseFiles {
 
             Path tabPath = Paths.get("/var/lib/ubicron/.ubicrontab");
             List<String> lines = Arrays.asList(table.print().split("\n"));
+            Files.deleteIfExists(tabPath);
             Files.write(tabPath, lines, StandardCharsets.US_ASCII);
 
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
