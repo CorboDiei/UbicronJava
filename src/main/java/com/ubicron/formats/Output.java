@@ -59,8 +59,8 @@ public class Output {
             JSONItem inputTree = new JSONItem("{}");
             for (String key : this.keys) {
                 Integer[] lineVals = this.keyToLine.get(key);
-                // System.out.println(lineVals[0]);
-                // System.out.println(lineVals[1]);
+                System.out.println(lineVals[0]);
+                System.out.println(lineVals[1]);
                 if (lineVals[0] < 0 || lineVals[0] >= outputText.size())
                     throw new JobExecutionException("command number outside of range");
                 // System.out.println("l1");
