@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Start definition
- *  Last edited: 9/4/21
+ *  Last edited: 9/11/21
  */
 
 import java.util.*;
@@ -11,74 +11,57 @@ import java.util.concurrent.*;
 
 public class Start {
 
-    private void shutdown(State state, Daemon daemon, Listener listener, ExecutorService tPool) {
-        state.shutdownDaemon();
-        state.shutdownListener();
-
-        daemon.interrupt();
-        daemon.join();
-
-        listener.interrupt();
-        listener.join();
-
-        tPool.shutdown();
-    }
-
     public static void main(String[] args) throws Exception {
 
-        Object[] parserOutput = ParseTable.parseTable();
+        Object[] tableParserOutput = ParseFiles.parseTable();
+        Object[] cfgParserOutput = ParseFiles.parseCfg();
 
-        List<Job> jobs = (List<Job>) parserOutput[0];
-        List<Instance> instances = (List<Instance>) parserOutput[1];
+        int portNum = (int) cfgParserOutput[0];
+
+        List<Job> jobs = (List<Job>) tableParserOutput[0];
+        List<Instance> instances = (List<Instance>) tableParserOutput[1];
         Map<String, Job> aliasToJob = new ConcurrentHashMap<>();
         Map<String, Instance> aliasToInstance = new ConcurrentHashMap<>();
         for (Job job : jobs) {
             aliasToJob.put(job.getAlias(), job);
         }
-        for (Instance instance : instances) {
-            aliasToInstance.put(instance.getAlias(), instance);
-        }
 
         ExecutorService threadPool = Executors.newFixedThreadPool(20);
 
-        Queue<Instance> timedInst = new PriorityBlockingQueue<>(instances.size(),
+        Queue<Instance> timedInst = new PriorityBlockingQueue<>(instances.size() + 1,
             (o1, o2) -> (int) (o1.getTimeToRun() - o2.getTimeToRun()));
 
         for (Instance inst : instances) {
             switch (inst.getType()) {
                 case INSTANT:
-                    JobExecutor jobEx = new JobExecutor(aliasToJob, aliasToJob.get(inst.getJob()),
-                            inst.getInput(), threadPool);
-                    threadPool.execute(jobEx);
+                    aliasToInstance.put(inst.getAlias(), inst);
+                    threadPool.execute(new JobExecutor(aliasToJob, aliasToJob.get(inst.getJob()),
+                            inst.getInput(), threadPool));
                     break;
                 case IN:
                     timedInst.add(inst);
+                    aliasToInstance.put(inst.getAlias(), inst);
                     break;
                 case RECURRING:
                     timedInst.add(inst);
+                    aliasToInstance.put(inst.getAlias(), inst);
                     break;
                 case STANDBY:
+                    aliasToInstance.put(inst.getAlias(), inst);
                     break;
             }
-            // System.out.println(inst.getTimeToRun());
         }
 
-        State state = new State();
+        RunState state = new RunState();
+        state.addThreadPool(threadPool);
 
-        Thread daemon = new Thread(new Daemon(aliasToJob, timedInst, threadPool, state));
+        Thread daemon = new Thread(new Daemon(aliasToJob, timedInst, instances, threadPool, state));
         daemon.start();
-        state.
+        state.addDaemon(daemon);
 
-        Thread listener = new Thread(new Listener)
-
-        Thread.sleep(30000);
-
-        state.shutdown();
-
-
-
-        // startup daemon, listen on port
-
-        // System.out.println(table.print());
+        Listener listener = new Listener(portNum, jobs, instances, aliasToJob, timedInst,
+            aliasToInstance, threadPool, state);
+        listener.start();
+        state.addListener(listener);
     }
 }

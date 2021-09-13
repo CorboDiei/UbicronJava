@@ -4,8 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-/**
+/** Copyright 2021 David Corbo
  * Unit test for JSONItem
+ * Last edited: 9/11/21
  */
 public class JSONItemTest {
 

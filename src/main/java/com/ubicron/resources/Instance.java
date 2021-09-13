@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Instance and Time definitions
- *  Last edited: 9/4/21 
+ *  Last edited: 9/11/21 
  */
 
 import java.util.*;
@@ -23,16 +23,16 @@ public class Instance {
     private Input input;
     private Types type;
     private TimeInfo timeInfo;
-    private String in;
     private long timeToRun;
+    private JSONItem tree;
 
-    public Instance(String alias, String job, Input input, Types type, TimeInfo info) {
+    public Instance(String alias, String job, Input input, Types type, TimeInfo info, JSONItem tree) {
         this.alias = alias;
         this.job = job; 
         this.input = input;
         this.type = type;
         this.timeInfo = info;
-        this.in = in;
+        this.tree = tree;
         if (this.type == Types.RECURRING || this.type == Types.IN) {
             this.timeToRun = this.timeInfo.timeToRun();
         }
@@ -60,8 +60,15 @@ public class Instance {
         return this.type;
     }
 
+    public JSONItem getTree() {
+        return this.tree;
+    }
+
     public Input getInput() {
         return this.input;
     }
 
+    public String toString() {
+        return this.tree.print();
+    }
 }

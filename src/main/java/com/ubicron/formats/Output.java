@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Job definition
- *  Last edited: 9/4/21
+ *  Last edited: 9/11/21
  */
 
 import java.util.*;
@@ -10,10 +10,12 @@ import java.lang.*;
 
 public class Output {
 
+    private JSONItem tree;
     private List<String> keys;
     private Map<String, Integer[]> keyToLine;
     
     private List<String> recKeys(JSONItem output) throws JSONAccessException {
+        this.tree = output;
         List<String> ret = new ArrayList<>();
         if (output.type != JSONItem.Types.STRUCT) {
             ret.add("");
@@ -83,11 +85,6 @@ public class Output {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (String key : this.keys) {
-            builder.append(key + ": " + this.keyToLine.get(key) + "\n");
-        }
-        return builder.toString();
-
+        return this.tree.print();
     }
 }

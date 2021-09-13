@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Job definition
- *  Last edited: 9/4/21
+ *  Last edited: 9/11/21
  */
 
 import java.util.*;
@@ -17,15 +17,17 @@ public class Job {
     private Input input;
     private Output output;
     private SubCalls subCalls;
+    private JSONItem tree;
 
     public Job(String alias, Map<String, String> environment, List<String> commands,
-                Input input, Output output, SubCalls subCalls) {
+                Input input, Output output, SubCalls subCalls, JSONItem tree) {
         this.alias = alias;
         this.environment = environment;
         this.commands = commands;
         this.input = input;
         this.output = output;
         this.subCalls = subCalls;
+        this.tree = tree;
     }
 
     public String getAlias() {
@@ -38,6 +40,10 @@ public class Job {
 
     public SubCalls getSubCalls() {
         return this.subCalls;
+    }
+
+    public JSONItem getTree() {
+        return this.tree;
     }
 
     public Input execute(Input input) {
@@ -77,13 +83,6 @@ public class Job {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("alias: " + this.alias + "\n");
-        builder.append("env: " + this.environment + "\n");
-        builder.append("commands: " + this.commands + "\n");
-        builder.append("input: \n" + this.input + "\n");
-        builder.append("output: \n" + this.output + "\n");
-        builder.append("subcalls: \n" + this.subCalls + "\n");
-        return builder.toString();
+        return this.tree.print();
     }
 }

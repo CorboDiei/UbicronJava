@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Module for parsing ubicrontab
- *  Last edited: 9/4/21
+ *  Last edited: 9/11/21
  */
 
 import java.util.*;
@@ -12,9 +12,9 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.*;
 
-public class ParseTable {
+public class ParseFiles {
 
-    private static List<Job> parseJobs(List<JSONItem> jobItems) throws JSONAccessException {
+    public static List<Job> parseJobs(List<JSONItem> jobItems) throws JSONAccessException {
         List<Job> jobList = new CopyOnWriteArrayList<>();
         for (JSONItem item : jobItems) {
             if (item.type != JSONItem.Types.STRUCT)
@@ -55,12 +55,12 @@ public class ParseTable {
                 throw new JSONAccessException("subcalls value is not of type object");
             SubCalls subcalls = new SubCalls(item.get("subcalls"));
 
-            jobList.add(new Job(alias, env, commands, input, output, subcalls));
+            jobList.add(new Job(alias, env, commands, input, output, subcalls, item));
         }
         return jobList;
     }
 
-    private static List<Instance> parseInstances(List<JSONItem> instanceItems) throws JSONAccessException {
+    public static List<Instance> parseInstances(List<JSONItem> instanceItems) throws JSONAccessException {
         List<Instance> instanceList = new CopyOnWriteArrayList<>();
         for (JSONItem item : instanceItems) {
             if (item.get("alias").type != JSONItem.Types.STRING)
@@ -109,7 +109,7 @@ public class ParseTable {
                 default:
                     throw new JSONAccessException("invalid type value");
             }
-            instanceList.add(new Instance(alias, job, input, type, info));
+            instanceList.add(new Instance(alias, job, input, type, info, item));
         }
         return instanceList;
     }
@@ -155,6 +155,69 @@ public class ParseTable {
         }
 
         return new Object[]{jobs, instances};
+    }
+
+    public static boolean saveTable(List<Job> jobs, List<Instance> instances) {
+        try {
+            JSONItem table = new JSONItem("{}");
+            JSONItem jobsItem = new JSONItem("[]");
+            JSONItem instsItem = new JSONItem("[]");
+            table.insert("jobs", jobsItem);
+            table.insert("instances", instsItem);
+            for (Job job : jobs) {
+                jobsItem.arrayValue.add(job.getTree());
+            }
+
+            for (Instance inst : instances) {
+                instsItem.arrayValue.add(inst.getTree());
+            }
+
+            Path tabPath = Paths.get("/var/lib/ubicron/.ubicrontab");
+            List<String> lines = Arrays.asList(table.print().split("\n"));
+            Files.write(tabPath, lines, StandardCharsets.US_ASCII);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static Object[] parseCfg() throws Exception {
+        // get cfg text
+        String cfgText = null;
+        int portNum = -1;
+
+        try {
+            // cfg file should be at /var/lib/ubicron/ubicron.cfg
+            // create table file if it doesn't exist
+            Path ubiLib = Paths.get("/var/lib/ubicron");
+            Files.createDirectories(ubiLib);
+            File cfgFile = new File("/var/lib/ubicron/ubicron.cfg");
+            cfgFile.createNewFile();
+            Path cfgPath = Paths.get("/var/lib/ubicron/ubicron.cfg");
+            byte[] encoded = Files.readAllBytes(cfgPath);
+            cfgText = new String(encoded, StandardCharsets.US_ASCII);
+
+            if (cfgText.trim().length() != 0) {
+                JSONItem cfg = new JSONItem(cfgText);
+                JSONItem port = cfg.get("port");
+                if (port.type != JSONItem.Types.INT)
+                    throw new JSONAccessException("port numbers must be integers");
+                portNum = port.intValue;
+            } else {
+                JSONItem cfg = new JSONItem("{}");
+                cfg.insert("port", new JSONItem("1909"));
+                List<String> lines = Arrays.asList(cfg.print().split("\n"));
+                Files.write(cfgPath, lines, StandardCharsets.US_ASCII);
+                portNum = 1909;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+
+        return new Object[]{portNum};
     }
 
 }

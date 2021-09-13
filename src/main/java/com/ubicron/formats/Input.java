@@ -2,7 +2,7 @@ package com.ubicron;
 
 /** Copyright 2021 David Corbo
  *  Job definition
- *  Last edited: 9/4/21
+ *  Last edited: 9/11/21
  */
 
 import java.util.*;
@@ -81,16 +81,6 @@ public class Input {
     }
 
     public String toString() {
-        try {
-            StringBuilder builder = new StringBuilder();
-            for (String key : this.keys) {
-                builder.append(key + ": " + this.tree.get(key).print() + "\n");
-            }
-            return builder.toString();
-        } catch (JSONAccessException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return null;
+        return this.tree.print();
     }
 }
